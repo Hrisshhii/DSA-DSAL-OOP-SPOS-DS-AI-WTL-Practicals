@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hrishi Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <header>
+        <img src="https://avatars.githubusercontent.com/u/9919?v=4" class="avatar">
+        <h1>Hi, I'm Hrishi</h1>
+        <p>Full-Stack Developer | React | Node.js | TypeScript</p>
+    </header>
+
+    <!-- About -->
+    <section class="card fade-in">
+        <h2>About Me</h2>
+        <p>
+            Computer Engineering student passionate about building real-world web applications.
+            Focused on clean code, performance, and scalable solutions.
+        </p>
+    </section>
+
+    <!-- Education -->
+    <section class="card fade-in">
+        <h2>Education</h2>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <h3>B.E. Computer Engineering</h3>
+                <p>Modern Education Society&apos;s Wadia College of Engineering, Pune</p>
+                <p>CGPA: 9.83 (FY) | 9.58 (SY)</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="card fade-in">
+        <h2>Tech Stack</h2>
+
+        <div class="grid">
+            <div class="mini-card">
+                <h3>Languages</h3>
+                <ul>
+                    <li>JavaScript</li>
+                    <li>TypeScript</li>
+                    <li>C++</li>
+                    <li>Python</li>
+                </ul>
+            </div>
+
+            <div class="mini-card">
+                <h3>Frontend</h3>
+                <ul>
+                    <li>React</li>
+                    <li>Next.js</li>
+                    <li>HTML</li>
+                    <li>CSS</li>
+                    <li>Tailwind</li>
+                </ul>
+            </div>
+
+            <div class="mini-card">
+                <h3>Backend</h3>
+                <ul>
+                    <li>Node.js</li>
+                    <li>Express.js</li>
+                </ul>
+            </div>
+
+            <div class="mini-card">
+                <h3>Database</h3>
+                <ul>
+                    <li>MongoDB</li>
+                    <li>MySQL</li>
+                    <li>Firebase</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="card fade-in">
+        <h2>More About Me</h2>
+
+        <ul>
+            <li>💡 I learn by building real-world projects</li>
+            <li>⚛️ Currently focused on React, TypeScript & scalable UI</li>
+            <li>🚀 Actively preparing for software development internships</li>
+            <li>🎬 Love movies & music — influences my UI/UX thinking</li>
+            <li>🧠 Strong in Data Structures & Problem Solving</li>
+        </ul>
+    </section>
+
+    <!-- Projects -->
+    <section class="card fade-in">
+        <h2>Projects</h2>
+
+        <div class="project">
+            <h3>Tars Chat</h3>
+            <p>Real-time chat app with authentication and live messaging.</p>
+            <button onclick="openProject('https://tars-chat-black.vercel.app')">View Project</button>
+        </div>
+
+        <div class="project">
+            <h3>Finance Dashboard</h3>
+            <p>Interactive dashboard with charts and transaction management.</p>
+            <button onclick="openProject('https://finance-dashboard-three-bice.vercel.app/')">View Project</button>
+        </div>
+
+        <div class="project">
+            <h3>Therapy Website</h3>
+            <p>Responsive frontend built using Next.js.</p>
+            <button onclick="openProject('https://therapy-ui-case-study.vercel.app/')">View Project</button>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="card fade-in">
+        <h2>Contact</h2>
+
+        <p>Email: <a href="mailto:rathodhrishi12345@gmail.com">rathodhrishi12345@gmail.com</a></p>
+        <p>Github: <a href="https://github.com/Hrisshhii" target="_blank">github.com/Hrisshhii</a></p>
+    </section>
+
+    <footer>
+        <p>© 2026 Hrishi | Built with HTML, CSS & JavaScript</p>
+    </footer>
+</div>
+
+<script>
+    // Open project
+    function openProject(url){
+        alert("Opening project 🚀");
+        window.open(url, "_blank");
+    }
+
+    // Scroll to top
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+</script>
+<button id="topBtn" onclick="scrollToTop()">↑</button>
+</body>
+</html>
