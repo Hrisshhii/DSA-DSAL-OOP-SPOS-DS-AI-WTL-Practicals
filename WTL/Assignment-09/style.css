@@ -1,0 +1,90 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f6f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    text-align: center;
+    width: 100%;
+}
+
+h2 {
+    margin-bottom: 15px;
+}
+
+.toggle {
+    margin-bottom: 15px;
+}
+
+.toggle button {
+    background: #ddd;
+    padding: 8px 15px;
+    border-radius: 6px;
+}
+
+.toggle .active {
+    background: #4CAF50;
+    color: white;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    width: 320px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.primary {
+    background: #4CAF50;
+    color: white;
+    width: 100%;
+}
+
+.logout {
+    background: #e74c3c;
+    color: white;
+}
+
+.success {
+    color: green;
+    margin-top: 10px;
+}
+
+.error {
+    color: red;
+    margin-top: 10px;
+}
