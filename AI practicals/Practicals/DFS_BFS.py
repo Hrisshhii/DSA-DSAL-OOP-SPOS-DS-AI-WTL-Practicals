@@ -24,7 +24,13 @@ def main():
     for i in range(n):
         node=input(f'Enter node {i+1}: ')
         neighbor=input(f'Enter the neighbors of {node}: ').split()
-        adj[node]=neighbor
+        if node not in adj:
+            adj[node]=[]
+        for neigh in neighbor:
+            adj[node].append(neigh)
+            if neigh not in adj:
+                adj[neigh]=[]
+            adj[neigh].append(node)
     num=input("\nEnter starting node: ")
     visited=set()
     print('DFS Traversal: ')
