@@ -1,12 +1,5 @@
 from collections import deque
 
-def dfs(node,adj,visited):
-    visited.add(node)
-    print(node,end=" ")
-    for neighbor in adj[node]:
-        if neighbor not in visited:
-            dfs(neighbor,adj,visited)
-
 def bfs(queue,adj,visited):
     if not queue:
         return
@@ -18,21 +11,28 @@ def bfs(queue,adj,visited):
             queue.append(neighbor)
     bfs(queue,adj,visited)
 
+def dfs(visited,adj,vertex):
+    visited.add(vertex)
+    print(vertex,end=" ")
+    for n in adj[vertex]:
+        if n not in visited:
+            dfs(visited,adj,n)
+
 def main():
     adj={}
-    n=int(input("Enter the number of nodes: "))
+    n=int(input("Enter the number of Nodes: "))
     for i in range(n):
-        node=int(input(f"Enter node {i}: "))
-        neighbors=list(map(int,input("Enter neighbors of {node}: ").split()))
-        adj[node]=neighbors
-    start=int(input("Enter starting node: "))
-    print("\nDFS Traversal: ")
+        node=input(f'Enter node {i+1}: ')
+        neighbor=input(f'Enter the neighbors of {node}: ').split()
+        adj[node]=neighbor
+    num=input("\nEnter starting node: ")
     visited=set()
-    dfs(start,adj,visited)
-
-    print("\n\nBFS Traversal")
-    visited=set([start])
-    q=deque([start])
+    print('DFS Traversal: ')
+    dfs(visited,adj,num)
+    
+    num=input("\nEnter starting node: ")
+    print('BFS Traversal: ')
+    visited=set([num])
+    q=deque([num])
     bfs(q,adj,visited)
-
 main()
