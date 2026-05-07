@@ -6,7 +6,7 @@ goal=[
     [7,8,0]
 ]
 
-def hueristic(state):
+def heuristic(state):
     count=0
     for i in range(3):
         for j in range(3):
@@ -30,7 +30,7 @@ def print_state(state):
 
 def astar(start):
     pq=PriorityQueue()
-    h=hueristic(start)
+    h=heuristic(start)
     pq.put((h,0,start,[]))
     visited=set()
     
@@ -57,7 +57,7 @@ def astar(start):
                 
                 if to_tuple(new_state) not in visited:
                     new_g=g+1
-                    new_h=hueristic(new_state)
+                    new_h=heuristic(new_state)
                     new_f=new_g+new_h
                     
                     pq.put((new_f,new_g,new_state,path+[current]))
