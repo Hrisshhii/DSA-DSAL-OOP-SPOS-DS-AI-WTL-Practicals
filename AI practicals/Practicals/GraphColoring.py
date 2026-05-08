@@ -19,7 +19,7 @@ class GraphColoring:
                 self.colors[v]=c
                 if self.coloring(v+1):
                     return True
-                self.colosr[v]=0
+                self.colors[v]=0
         return False
     
     def print_result(self):
