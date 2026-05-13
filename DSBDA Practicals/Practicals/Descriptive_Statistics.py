@@ -40,8 +40,9 @@ print("\nMale Marks:", male_marks)
 print("Female Marks:", female_marks)
 
 # Load Iris Dataset
-iris = pd.read_csv("Iris.csv")
-
+#iris = pd.read_csv("Iris.csv")
+import seaborn as sb
+iris=sb.load_dataset("iris")
 print("\nIris Dataset")
 print(iris.head())
 
