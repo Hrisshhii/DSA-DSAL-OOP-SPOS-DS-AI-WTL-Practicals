@@ -17,9 +17,9 @@ df = pd.read_csv("Iris.csv")
 print(df.head())
 
 # Features and Target
-X = df.iloc[:, 1:5]
+X = df.iloc[:, 1:4]
 
-y = df.iloc[:, 5]
+y = df.iloc[:, 4]
 
 # Train-Test Split
 X_train, X_test, y_train, y_test = train_test_split(
