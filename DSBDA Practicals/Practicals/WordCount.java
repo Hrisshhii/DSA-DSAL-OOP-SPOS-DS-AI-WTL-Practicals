@@ -119,6 +119,7 @@ gedit WordCount.java
 export HADOOP_CLASSPATH=$(hadoop classpath)
 hadoop com.sun.tools.javac.Main WordCount.java
 jar cf wc.jar WordCount*.class
+
 gedit input.txt
 hdfs dfs -mkdir /input
 hdfs dfs -put input.txt /input
