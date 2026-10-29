@@ -31,8 +31,10 @@ for i in range(n):
     selected.append((i,capacity,ratio[i]*capacity,1))
   else:
     fraction=capacity/weight[i]
-    totalProfit+=ratio[i]*capacity
+    itemProfit=ratio[i]*capacity
+    totalProfit+=itemProfit
     selected.append((i,capacity,ratio[i]*capacity,fraction))
+    capacity=0
     break
 
 print("\nSelected Items:")
