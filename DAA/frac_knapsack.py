@@ -42,3 +42,20 @@ for item, w, p, fraction in selected:
     print(f"Item {item}: Weight = {w}, Profit = {p:.2f}, Fraction = {fraction:.2f}")
 print("Maximum Profit: ",totalProfit)
   
+"""
+Enter the number of items: 3
+Enter Weight for item 0: 10
+Enter Profit for item 0: 60
+Enter Weight for item 1: 20
+Enter Profit for item 1: 100
+Enter Weight for item 2: 30
+Enter Profit for item 2: 120
+Enter Knapsack Capacity: 50
+
+Selected Items:
+Item 0: Weight = 10, Profit = 60.00, Fraction = 1.00
+Item 1: Weight = 20, Profit = 100.00, Fraction = 1.00
+Item 2: Weight = 20, Profit = 80.00, Fraction = 0.67
+
+Maximum Profit: 240.00
+"""
