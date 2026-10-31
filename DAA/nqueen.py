@@ -1,6 +1,5 @@
-n=int(input("Enter the Number of Queens: "))
-board=[[0 for i in range(n)] for i in range(n)]
-board[0][0]=1
+n=int(input("ENTER THE NUMBE ROF QUEENS TO BE PLACED: "))
+board=[[0 for i in range(n)] for j in range(n)]
 
 def is_safe(row,col):
   for i in range(row):
@@ -25,7 +24,6 @@ def is_safe(row,col):
 def solve(row):
   if row==n:
     return True
-
   for col in range(n):
     if is_safe(row,col):
       board[row][col]=1
@@ -34,16 +32,15 @@ def solve(row):
       board[row][col]=0
   return False
 
-if n==1:
-  result=True
-elif n<4:
-  result=False
-else: 
-  result=solve(1)
-
+result=solve(0)
 if result:
-  print("N QUEEN BOARD: ")
-  for row in board:
-    print(row)
+    print("BOARD AFTER PLACING THE QUEENS:")
+    for i in range(n):
+        for j in range(n):
+            if board[i][j]==1:
+                print("Q",end=" ")
+            else:
+                print("-",end=" ")
+        print()
 else:
-  print("Solution does not exist!!")
+    print("NO SOLUTION!!")
