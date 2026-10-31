@@ -34,3 +34,34 @@ contract Bank{
     return user_exist[msg.sender];
   }
 }
+
+/*
+pragma solidity ^0.8.18;
+
+contract Bank{
+  mapping(address=>uint) balance;
+  mapping(address=>bool) user_exist;
+
+  function deposit() public payable{
+    require(msg.value>0,"Enter the Value: ");
+    user_exist[msg.sender]=true;
+    balance[msg.sender]+=msg.value;
+  }
+
+  function withdraw(uint amount) public returns(string memory){
+    require(user_exist[msg.sender]==true,"ACCOUNT DOES NOT EXIST");
+    require(balance[msg.sender]>=amount,"INSUFFICIENT BALANCE");
+    balance[msg.sender]-=amount;
+    (bool success, ) = payable(msg.sender).call{value: amount}("");
+    require(success, "Transfer Failed");
+    return "Withdraw Successfull";
+  }
+  function showBalance() public view returns(uint){
+    return balance[msg.sender];
+  }
+
+  function accountExist() public view returns(bool){
+    return user_exist[msg.sender];
+  }
+}
+*/
