@@ -197,3 +197,131 @@ new_ride = pd.DataFrame([{
 print("Linear Regression Fare:", lr.predict(new_ride)[0])
 print("Random Forest Fare:", rf.predict(new_ride)[0])
 ```
+
+```text
+
+# 1. Import libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+
+# 2. Load dataset
+df = pd.read_csv("uber.csv")
+
+print(df.head())
+print(df.info())
+
+# 3. Preprocessing
+df = df.dropna()
+
+df = df.drop(['Unnamed: 0', 'key'], axis=1, errors='ignore')
+
+df['pickup_datetime'] = pd.to_datetime(
+    df['pickup_datetime'], errors='coerce', utc=True
+)
+
+df = df.dropna(subset=['pickup_datetime'])
+
+# Extract time features
+df['hour'] = df['pickup_datetime'].dt.hour
+df['day'] = df['pickup_datetime'].dt.day
+df['month'] = df['pickup_datetime'].dt.month
+
+df = df.drop('pickup_datetime', axis=1)
+
+# 4. Calculate distance
+def distance(lat1, lon1, lat2, lon2):
+    lat1, lon1, lat2, lon2 = map(
+        np.radians, [lat1, lon1, lat2, lon2]
+    )
+
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
+
+    c = 2 * np.arcsin(np.sqrt(a))
+
+    return 6371 * c
+
+df['distance'] = distance(
+    df['pickup_latitude'], df['pickup_longitude'],
+    df['dropoff_latitude'], df['dropoff_longitude']
+)
+
+# 5. Remove invalid values
+df = df[
+    (df['pickup_latitude'].between(-90, 90)) &
+    (df['dropoff_latitude'].between(-90, 90)) &
+    (df['pickup_longitude'].between(-180, 180)) &
+    (df['dropoff_longitude'].between(-180, 180)) &
+    (df['distance'] > 0) &
+    (df['distance'] < 100) &
+    (df['fare_amount'] > 0) &
+    (df['fare_amount'] < 100) &
+    (df['passenger_count'] > 0)
+]
+
+# 6. Remove outliers using IQR
+Q1 = df['fare_amount'].quantile(0.25)
+Q3 = df['fare_amount'].quantile(0.75)
+
+IQR = Q3 - Q1
+
+lower = Q1 - 1.5 * IQR
+upper = Q3 + 1.5 * IQR
+
+df = df[
+    (df['fare_amount'] >= lower) &
+    (df['fare_amount'] <= upper)
+]
+
+print("Shape after preprocessing:", df.shape)
+
+# 7. Correlation heatmap
+sns.heatmap(df.corr(numeric_only=True), annot=True, cmap='coolwarm')
+plt.title("Correlation Heatmap")
+plt.show()
+
+# 8. Select input and output
+X = df.drop('fare_amount', axis=1)
+y = df['fare_amount']
+
+# 9. Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# 10. Linear Regression
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+
+y_pred1 = lr.predict(X_test)
+
+# 11. Random Forest Regression
+rf = RandomForestRegressor(
+    n_estimators=100, max_depth=15, random_state=42, n_jobs=-1
+)
+
+rf.fit(X_train, y_train)
+
+y_pred2 = rf.predict(X_test)
+
+# 12. Evaluate models
+print("\nLINEAR REGRESSION")
+print("R2 Score:", r2_score(y_test, y_pred1))
+print("RMSE:", np.sqrt(mean_squared_error(y_test, y_pred1)))
+print("MAE:", mean_absolute_error(y_test, y_pred1))
+
+print("\nRANDOM FOREST")
+print("R2 Score:", r2_score(y_test, y_pred2))
+print("RMSE:", np.sqrt(mean_squared_error(y_test, y_pred2)))
+print("MAE:", mean_absolute_error(y_test, y_pred2))
+
+```
