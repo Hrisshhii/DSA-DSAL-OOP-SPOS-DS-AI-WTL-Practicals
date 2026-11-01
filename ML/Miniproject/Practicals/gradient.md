@@ -63,3 +63,27 @@ plt.title("Gradient Descent Convergence")
 plt.grid(True)
 plt.show()
 ```
+
+###
+```text
+x=2
+lr=0.1
+itr=100
+for i in range(itr):
+  x=x-lr*derivative(x)
+print('Min x: ',x)
+print('Min y: ',f(x))
+
+x=2
+x_history=[]
+for i in range(itr):
+  x_history.append(x)
+  x=x-lr*derivative(x)
+x_value=np.linspace(-6,4,100)
+y_value=f(x_value)
+
+plt.plot(x_value,y_value,label="y=(x+3)^2")
+plt.scatter(x_history,f(np.array(x_history)),color='red',label="Gradient Descent")
+plt.legend()
+plt.show()
+```
