@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
+from scipy.cluster.hierarchy import dendrogram,linkage
 
 df = pd.read_csv("sales_data_sample.csv", encoding="ISO-8859-1")
 print(df.head())
@@ -46,4 +47,19 @@ print(df[["QUANTITYORDERED", "PRICEEACH", "SALES", "Cluster"]].head())
 
 print("\nNumber of records in each cluster:")
 print(df["Cluster"].value_counts())
+```
+### 7. Visualize:
+```python3
+plt.scatter(x_scaled[:,0],x_scaled[:,1],c=y_kmeans,cmap='rainbow')
+
+plt.xlabel("Quantity Ordered")
+plt.ylabel("Price Each")
+plt.title("K-Means Clustering")
+plt.show()
+```
+```python3
+linked=linkage(x_scaled[:100],method='ward')
+plt.figure(figsize=(10,5))
+dendrogram(linked)
+plt.show()
 ```
