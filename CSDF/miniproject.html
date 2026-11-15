@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lightbench – Advanced Image Forensics</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* OBSIDIAN CYBER-SLATE PALETTE */
+  --bg: #090d14;
+  --panel: rgba(18, 26, 38, 0.75);
+  --panel-solid: #121a26;
+  --panel-card: #182333;
+  --border: #233145;
+  --border-focus: #00ff88;
+  --text: #f1f5f9;
+  --text-muted: #64748b;
+  
+  /* NEON DARK GREEN ACCENT & FORENSIC INDICATORS */
+  --accent: #00ff88;
+  --accent-glow: rgba(0, 255, 136, 0.25);
+  --ok: #00ff88;
+  --wn: #f59e0b;
+  --bad: #ef4444;
+  --vp-bg: #030712;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* --- TOP COMMAND BAR --- */
+header {
+  height: 54px;
+  background: var(--panel-solid);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  z-index: 10;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: var(--accent);
+}
+.brand-badge {
+  background: rgba(0, 255, 136, 0.15);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* --- WORKBENCH LAYOUT --- */
+.workbench {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 54px);
+  position: relative;
+}
+
+/* --- LEFT SIDEBAR: TOOLS & CONTROLS --- */
+aside {
+  width: 310px;
+  background: var(--panel-solid);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 5;
+  overflow-y: auto;
+}
+.panel-section {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* BUTTONS & CONTROLS */
+button, select, input[type="file"] {
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text);
+  background: var(--panel-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+button:hover, select:hover {
+  border-color: var(--accent);
+  background: #1f2d42;
+}
+button.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #090d14;
+  font-weight: 700;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.tool-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tool-grid button {
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+}
+.preset-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.preset-group button {
+  padding: 6px;
+  font-size: 11px;
+  text-align: center;
+}
+
+/* CONTROL SLIDERS */
+.control-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+.control-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+input[type="range"] {
+  accent-color: var(--accent);
+  width: 100%;
+}
+
+/* --- MAIN CANVAS VIEWPORT --- */
+main {
+  flex: 1;
+  background: var(--vp-bg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.viewport-toolbar {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 4px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 4;
+}
+.view-mode-group {
+  display: flex;
+  gap: 4px;
+}
+.view-mode-group button {
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px;
+}
+
+#vp {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  position: relative;
+  padding: 40px;
+}
+#cv {
+  position: relative;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
+  border-radius: 4px;
+  overflow: hidden;
+  width: calc(var(--z,1)*100%);
+  max-width: 100%;
+}
+#cv canvas { display: block; width: 100%; image-rendering: pixelated; }
+#cv.split #co { position: absolute; inset: 0; }
+#cv.side { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+#cv.one #co { display: none; }
+
+.split-slider-container {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  background: var(--panel);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 20px;
+  z-index: 4;
+}
+
+/* HUD PIXEL PROBE */
+.hud-probe {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  background: var(--panel);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  z-index: 4;
+}
+
+/* --- RIGHT SIDEBAR: ASSESSMENT & REPORT --- */
+#right {
+  width: 360px;
+  background: var(--panel-solid);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.score-card {
+  background: var(--panel-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px;
+  font-weight: 700;
+}
+#bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+#bar i { display: block; height: 100%; background: var(--accent); transition: width 0.3s ease; }
+
+.chk {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 12px;
+}
+.chk div {
+  padding: 6px 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.chk .w { border-color: rgba(239, 68, 68, 0.4); color: var(--bad); }
+.chk .g { border-color: rgba(0, 255, 136, 0.4); color: var(--ok); }
+
+.f {
+  border-left: 3px solid var(--text-muted);
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: var(--bg);
+  border-radius: 0 4px 4px 0;
+  font-size: 12px;
+}
+.f.High { border-color: var(--bad); }
+.f.Medium { border-color: var(--wn); }
+.f.Low { border-color: var(--accent); }
+.f b { display: block; color: var(--text); margin-bottom: 2px; }
+
+.hash {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  word-break: break-all;
+  background: var(--bg);
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--accent);
+}
+pre {
+  white-space: pre-wrap;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  margin: 8px 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--bg);
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span>LIGHTBENCH</span>
+    <span class="brand-badge">Forensics v2.0</span>
+  </div>
+  <div class="header-actions">
+    <input type="file" id="fi" accept="image/png,image/jpeg">
+    <button id="pr">Print Report</button>
+  </div>
+</header>
+
+<div class="workbench">
+  <!-- LEFT SIDEBAR: CONTROLS & MODULES -->
+  <aside>
+    <div class="panel-section">
+      <div class="panel-title">Presets</div>
+      <div class="preset-group">
+        <button data-p="splice">Invoice</button>
+        <button data-p="stego">Stego</button>
+        <button data-p="clean">Clean</button>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">Forensic Modules</div>
+      <div class="tool-grid" id="tools"></div>
+    </div>
+
+    <div class="panel-section" id="ctl">
+      <div class="panel-title">Module Settings</div>
+      <div class="control-row" id="l1">
+        <div class="control-label"><span>Param 1</span><b id="v1"></b></div>
+        <input type="range" id="s1">
+      </div>
+      <div class="control-row" id="l2">
+        <div class="control-label"><span>Param 2</span><b id="v2"></b></div>
+        <input type="range" id="s2">
+      </div>
+      <div class="control-row" style="margin-top: 10px;">
+        <select id="ch">
+          <option value="a">All Channels</option>
+          <option value="0">Red Channel</option>
+          <option value="1">Green Channel</option>
+          <option value="2">Blue Channel</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">Guidance</div>
+      <div id="hint" style="color: var(--text-muted); font-size: 12px;">Select a module to view forensic instructions.</div>
+    </div>
+  </aside>
+
+  <!-- MAIN CANVAS VIEWPORT -->
+  <main>
+    <div class="viewport-toolbar">
+      <div class="view-mode-group" id="views">
+        <button data-v="split" class="on">Split</button>
+        <button data-v="side">Side-by-Side</button>
+        <button data-v="one">Result</button>
+      </div>
+      <div style="height: 16px; width: 1px; background: var(--border);"></div>
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-muted);">
+        Zoom
+        <input type="range" id="z" min="50" max="300" value="100" style="width: 80px;">
+      </div>
+    </div>
+
+    <div id="vp">
+      <div id="cv" class="split">
+        <canvas id="cp"></canvas>
+        <canvas id="co"></canvas>
+      </div>
+    </div>
+
+    <div class="split-slider-container" id="sp-container">
+      <input type="range" id="sp" min="0" max="100" value="50" aria-label="Split position">
+    </div>
+
+    <div class="hud-probe" id="probe">Hover over canvas to inspect pixels.</div>
+  </main>
+
+  <!-- RIGHT SIDEBAR: ASSESSMENT & REPORT -->
+  <section id="right">
+    <div class="panel-section">
+      <div class="panel-title">Authenticity Assessment</div>
+      <div class="score-card">
+        <div>
+          <div id="score">–</div>
+          <div id="verdict" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">No image loaded.</div>
+        </div>
+      </div>
+      <div id="bar"><i style="width:0"></i></div>
+      <div class="chk" id="chk"></div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">Automated Findings</div>
+      <div id="fl" style="color: var(--text-muted);">Awaiting file analysis...</div>
+    </div>
+
+    <div class="panel-section" id="meta">
+      <div class="panel-title">Evidence Metadata</div>
+      <div style="color: var(--text-muted);">No image loaded.</div>
+    </div>
+
+    <div class="panel-section" id="rep">
+      <div class="panel-title" style="display: flex; justify-content: space-between;">
+        <span>Case Report</span>
+        <button id="cp1" style="padding: 2px 8px; font-size: 10px;">Copy Report</button>
+      </div>
+      <pre id="rt"></pre>
+    </div>
+  </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),cvO=$('#co'),cvP=$('#cp'),xO=cvO.getContext('2d'),xP=cvP.getContext('2d');
+const S={mode:'ela',F:[],cm:[]};
+const MODES={ela:['Error level analysis','Look for areas that glow brighter than their surroundings: they were saved differently.',['JPEG quality',40,95,75],['Gain',5,40,20]],
+noise:['Noise residue','Real camera noise is even. Patches with different texture may be pasted or retouched.',0,['Gain',2,30,10]],
+edge:['Edge map','Pasted or resized objects often have edges sharper or softer than the rest of the picture.',0,['Gain',1,12,4]],
+copy:['Copy-move scan','Green and neon blocks are near-identical regions found at two different places.',0,0],
+bits:['Bit planes','Bit 0 strips the picture and exposes anything hidden in the lowest bits. Noise is normal; shapes or text are not.',['Bit',0,7,0],0],
+light:['Light direction','Colours show the local brightness gradient direction. An object lit differently from its surroundings may be inserted.',0,0],
+contrast:['Contrast stretch','Exaggerates tonal differences to reveal faint seams.',0,['Strength',1,8,3]]};
+const T=$('#tools');for(const k in MODES){const b=document.createElement('button');b.textContent=MODES[k][0];b.dataset.m=k;T.append(b)}
+function setMode(k){S.mode=k;const m=MODES[k];document.querySelectorAll('#tools button').forEach(b=>b.classList.toggle('on',b.dataset.m==k));
+ [[1,m[2]],[2,m[3]]].forEach(([n,c])=>{const l=$('#l'+n);l.style.display=c?'flex':'none';if(c){l.querySelector('span').textContent=c[0];const s=$('#s'+n);s.min=c[1];s.max=c[2];s.value=c[3];$('#v'+n).textContent=c[3]}});
+ $('#ch').style.display=k=='bits'?'':'none';$('#hint').textContent=m[1];render()}
+T.onclick=e=>e.target.dataset.m&&setMode(e.target.dataset.m);
+['s1','s2'].forEach((id,i)=>$('#'+id).oninput=e=>{$('#v'+(i+1)).textContent=e.target.value;render()});$('#ch').onchange=render;
+$('#views').onclick=e=>{const v=e.target.dataset.v;if(!v)return;$('#cv').className=v;document.querySelectorAll('#views button').forEach(b=>b.classList.toggle('on',b==e.target));$('#sp-container').style.display=v=='split'?'':'none'};
+const clip=()=>cvO.style.clipPath=`inset(0 ${100-$('#sp').value}% 0 0)`;$('#sp').oninput=clip;
+$('#z').oninput=e=>$('#cv').style.setProperty('--z',e.target.value/100);
+$('#cv').onpointermove=e=>{if(!S.src)return;const r=cvO.getBoundingClientRect(),x=Math.floor((e.clientX-r.left)/r.width*S.w),y=Math.floor((e.clientY-r.top)/r.height*S.h);if(x<0||y<0||x>=S.w||y>=S.h)return;const i=(y*S.w+x)*4,d=S.src.data,h='#'+[0,1,2].map(k=>d[i+k].toString(16).padStart(2,'0')).join('');$('#probe').textContent=`${h} | rgb(${d[i]}, ${d[i+1]}, ${d[i+2]}) | Lum ${Math.round(.299*d[i]+.587*d[i+1]+.114*d[i+2])} | (${x}, ${y})`};
+function md5(b){const K=new Int32Array(64),R=[7,12,17,22,5,9,14,20,4,11,16,23,6,10,15,21];for(let i=0;i<64;i++)K[i]=Math.floor(Math.abs(Math.sin(i+1))*4294967296)|0;
+ const n=b.length,l=((n+8>>6)+1)<<4,w=new Int32Array(l);for(let i=0;i<n;i++)w[i>>2]|=b[i]<<(i%4*8);w[n>>2]|=0x80<<(n%4*8);w[l-2]=n<<3;w[l-1]=n>>>29;
+ let a0=1732584193,b0=-271733879,c0=-1732584194,d0=271733878;
+ for(let o=0;o<l;o+=16){let A=a0,B=b0,C=c0,D=d0;for(let i=0;i<64;i++){let F,g;if(i<16){F=B&C|~B&D;g=i}else if(i<32){F=D&B|~D&C;g=(5*i+1)%16}else if(i<48){F=B^C^D;g=(3*i+5)%16}else{F=C^(B|~D);g=7*i%16}
+  const s=R[(i>>4)*4+i%4],t=D,x=(A+F+K[i]+w[o+g])|0;D=C;C=B;B=(B+(x<<s|x>>>32-s))|0;A=t}a0=(a0+A)|0;b0=(b0+B)|0;c0=(c0+C)|0;d0=(d0+D)|0}
+ return[a0,b0,c0,d0].map(v=>{let s='';for(let i=0;i<4;i++)s+=(v>>>i*8&255).toString(16).padStart(2,'0');return s}).join('')}
+const hx=b=>[...new Uint8Array(b)].map(v=>v.toString(16).padStart(2,'0')).join('');
+async function hashes(u8){let a='n/a',b='n/a';try{a=hx(await crypto.subtle.digest('SHA-256',u8));b=hx(await crypto.subtle.digest('SHA-1',u8))}catch(e){}return{sha256:a,sha1:b,md5:md5(u8)}}
+function structure(u8){const o={kind:'Unknown',parts:[],trail:0,exif:{},sw:[]},L=u8.length,dv=new DataView(u8.buffer,u8.byteOffset,L);
+ if(u8[0]==0xFF&&u8[1]==0xD8){o.kind='JPEG';let p=2;const N={0xE0:'APP0',0xE1:'APP1',0xDB:'DQT',0xC0:'SOF0',0xC2:'SOF2',0xC4:'DHT',0xDA:'SOS',0xFE:'COM'};
+  while(p<L-4&&u8[p]==0xFF){const m=u8[p+1],n=dv.getUint16(p+2);o.parts.push(N[m]||'0x'+m.toString(16));if(m==0xE1&&u8[p+4]==0x45)exif(p+10,p+2+n,o);if(m==0xDA)break;p+=2+n}
+  let e=L-2;while(e>2&&!(u8[e]==0xFF&&u8[e+1]==0xD9))e--;o.parts.push('EOI');o.trail=L-(e+2)}
+ else if(u8[0]==0x89&&u8[1]==0x50){o.kind='PNG';let p=8;while(p<L-8){const n=dv.getUint32(p),t=String.fromCharCode(...u8.slice(p+4,p+8));o.parts.push(t);p+=12+n;if(t=='IEND'){o.trail=L-p;break}}}
+ const h=new TextDecoder('latin1').decode(u8.slice(0,65536)),m=h.match(/Photoshop|GIMP|Canva|Adobe|Paint\.NET|Lightroom|Snapseed|Pixelmator/gi);o.sw=[...new Set(m||[])];return o;
+ function exif(t,end,o){const le=u8[t]==0x49,g16=p=>dv.getUint16(p,le),g32=p=>dv.getUint32(p,le),str=(p,n)=>{const a=n>4?t+g32(p+8):p+8;return new TextDecoder().decode(u8.slice(a,a+n-1))};
+  const ifd=(p,dep)=>{const c=g16(p);for(let i=0;i<c;i++){const q=p+2+i*12,tag=g16(q),ty=g16(q+2),n=g32(q+4);
+   if(ty==2&&{0x10F:'Make',0x110:'Model',0x131:'Software',0x132:'Date/time',0x9003:'Original date'}[tag])o.exif[{0x10F:'Make',0x110:'Model',0x131:'Software',0x132:'Date/time',0x9003:'Original date'}[tag]]=str(q,n);
+   if(tag==0x8769&&dep<2)ifd(t+g32(q+8),dep+1);if(tag==0x8825)o.exif['GPS']='present'}};try{ifd(t+g32(t+4),0)}catch(e){}}}
+function gray(){const d=S.src.data,G=new Float32Array(S.w*S.h);for(let i=0;i<G.length;i++)G[i]=.299*d[i*4]+.587*d[i*4+1]+.114*d[i*4+2];return G}
+function recomp(q){return new Promise(r=>{const c=document.createElement('canvas');c.width=S.w;c.height=S.h;c.getContext('2d').putImageData(S.src,0,0);const im=new Image();im.onload=()=>{const x=document.createElement('canvas');x.width=S.w;x.height=S.h;const k=x.getContext('2d');k.drawImage(im,0,0);r(k.getImageData(0,0,S.w,S.h).data)};im.src=c.toDataURL('image/jpeg',q)})}
+async function render(){if(!S.src)return;const{w,h}=S,d=S.src.data,o=new ImageData(w,h),od=o.data,M=S.mode,a=+$('#s1').value,g=+$('#s2').value,ch=$('#ch').value;for(let i=3;i<od.length;i+=4)od[i]=255;
+ if(M=='ela'){const r=await recomp(a/100);for(let i=0;i<d.length;i+=4)for(let k=0;k<3;k++)od[i+k]=Math.min(255,Math.abs(d[i+k]-r[i+k])*g)}
+ else if(M=='noise'||M=='edge'){const G=gray();for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const i=y*w+x;let v=M=='noise'?Math.abs(8*G[i]-G[i-1]-G[i+1]-G[i-w]-G[i+w]-G[i-w-1]-G[i-w+1]-G[i+w-1]-G[i+w+1])/8*g:Math.hypot(G[i+1]-G[i-1],G[i+w]-G[i-w])*g/2;v=Math.min(255,v);od[i*4]=od[i*4+1]=od[i*4+2]=v}}
+ else if(M=='bits'){for(let i=0;i<d.length;i+=4){if(ch=='a')for(let k=0;k<3;k++)od[i+k]=(d[i+k]>>a&1)*255;else{od[i+ +ch]=(d[i+ +ch]>>a&1)*255}}}
+ else if(M=='light'){const G=gray();for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const i=y*w+x,gx=G[i+1]-G[i-1],gy=G[i+w]-G[i-w],H=(Math.atan2(gy,gx)+Math.PI)/(2*Math.PI)*6,V=Math.min(1,Math.hypot(gx,gy)/40),f=n=>{const k=(n+H)%6;return V*(1-Math.max(0,Math.min(k,4-k,1)))};od[i*4]=f(5)*255;od[i*4+1]=f(3)*255;od[i*4+2]=f(1)*255}}
+ else if(M=='contrast'){for(let i=0;i<d.length;i+=4)for(let k=0;k<3;k++)od[i+k]=Math.max(0,Math.min(255,(d[i+k]-128)*g+128))}
+ else if(M=='copy'){for(let i=0;i<d.length;i+=4)for(let k=0;k<3;k++)od[i+k]=d[i+k]*.35;S.cm.forEach(([x,y,c])=>{for(let j=0;j<12;j++)for(let i=0;i<12;i++){const p=((y+j)*w+x+i)*4;od[p]=c?0:0;od[p+1]=c?255:200;od[p+2]=c?136:50}})}
+ xP.putImageData(o,0,0)}
+async function analyze(u8,name){const F=[],C=[],add=(sev,t,x)=>F.push({sev,t,x});let sc=100;const st=structure(u8),hs=await hashes(u8);S.st=st;S.hs=hs;
+ const G=gray(),{w,h}=S,bw=Math.floor(w/16),bh=Math.floor(h/16);
+ const r=await recomp(.75),d=S.src.data,bm=[];for(let by=0;by<bh;by++)for(let bx=0;bx<bw;bx++){let s=0;for(let y=0;y<16;y++)for(let x=0;x<16;x++){const i=((by*16+y)*w+bx*16+x)*4;s+=Math.abs(d[i]-r[i])+Math.abs(d[i+1]-r[i+1])+Math.abs(d[i+2]-r[i+2])}bm.push(s/768)}
+ const sorted=[...bm].sort((a,b)=>a-b),med=sorted[bm.length>>1],hot=bm.filter(v=>v>2.2*med+3).length,frac=hot/bm.length;
+ if(st.kind=='JPEG'&&hot>=3&&frac<.3){sc-=30;add('High','Compression discontinuity','Error level analysis shows '+hot+' blocks ('+Math.round(frac*100)+'%) whose recompression error is far above the rest. This pattern is typical of pasted or retouched regions.');C.push(['Compression balance',0])}
+ else{C.push(['Compression balance',1]);if(st.kind=='PNG')add('Info','Lossless format','PNG has no JPEG history, so error level analysis is less informative here.')}
+ if(st.trail>0){sc-=15;add('Medium','Data after end marker',st.trail+' extra bytes follow the image terminator. Possible appended payload.');C.push(['File terminator',0])}else C.push(['File terminator',1]);
+ if(st.sw.length){sc-=15;add('Medium','Editing software signature','Header contains: '+st.sw.join(', ')+'.');C.push(['Editing software',0])}else C.push(['Editing software',1]);
+ const ek=Object.keys(st.exif);if(!ek.length){sc-=3;add('Low','No camera metadata','No EXIF tags found. Common for web-shared files, so this alone proves nothing.');C.push(['Camera EXIF',0])}else C.push(['Camera EXIF',1]);
+ const u=new Uint8Array(w*h);for(let i=0;i<u.length;i++)u[i]=d[i*4]&1;let uni=0,non=0;for(let by=0;by<Math.floor(h/8);by++)for(let bx=0;bx<Math.floor(w/8);bx++){const f=u[by*8*w+bx*8];let same=1;for(let y=0;y<8&&same;y++)for(let x=0;x<8;x++)if(u[(by*8+y)*w+bx*8+x]!=f){same=0;break}same?uni++:non++}
+ if(uni>=4&&non/(uni+non)>.6){sc-=25;add('High','Structured content in lowest bit plane',uni+' uniform 8×8 blocks sit inside an otherwise noisy bit 0 plane. Open Bit planes, bit 0, to look for hidden text or a watermark.');C.push(['Hidden data',0])}else C.push(['Hidden data',1]);
+ S.cm=[];const bk=new Map(),B=12;for(let y=0;y+B<=h;y+=B)for(let x=0;x+B<=w;x+=B){let m=[0,0,0,0],v=0,mu=0;for(let j=0;j<B;j++)for(let i=0;i<B;i++){const q=G[(y+j)*w+x+i];m[(j>=6?2:0)+(i>=6?1:0)]+=q;mu+=q}mu/=B*B;for(let j=0;j<B;j++)for(let i=0;i<B;i++)v+=(G[(y+j)*w+x+i]-mu)**2;if(Math.sqrt(v/(B*B))<8)continue;const k=m.map(z=>Math.round(z/36/12)).join(',');(bk.get(k)||bk.set(k,[]).get(k)).push([x,y])}
+ let pairs=0;bk.forEach(l=>{if(l.length>1){const[a,b]=[l[0],l[l.length-1]];if(Math.hypot(a[0]-b[0],a[1]-b[1])>36){pairs++;S.cm.push([...a,0],[...b,1])}}});
+ if(pairs>=6){sc-=20;add('Medium','Possible copy-move','Found '+pairs+' pairs of near-identical textured blocks at distant positions. Check the Copy-move scan.');C.push(['Copy-move',0])}else C.push(['Copy-move',1]);
+ sc=Math.max(0,sc);S.F=F;S.C=C;S.sc=sc;S.name=name;S.ek=ek;
+ $('#score').textContent=sc+' / 100';$('#bar i').style.width=sc+'\%';$('#bar i').style.background=sc>=80?'var(--ok)':sc>=55?'var(--wn)':'var(--bad)';
+ const vd=sc>=80?'No strong indicators found':sc>=55?'Some indicators found – examine further':'Strong indicators of modification or hidden data';$('#verdict').textContent=vd;S.vd=vd;
+ $('#chk').innerHTML=C.map(([n,ok])=>`<div class="${ok?'g':'w'}">${ok?'✓':'!'} ${n}</div>`).join('');
+ $('#fl').innerHTML=F.length?F.map(f=>`<div class="f ${f.sev}"><b>${f.sev}: ${f.t}</b>${f.x}</div>`).join(''):'No indicators were raised.';
+ $('#meta').innerHTML=`<div class="panel-title">Evidence Metadata</div><div style="font-size:11px; margin-bottom:8px;">${name}<br>${st.kind}, ${S.ow}×${S.oh} px, ${(u8.length/1024).toFixed(1)} KB</div>`+[['SHA-256',hs.sha256],['SHA-1',hs.sha1],['MD5',hs.md5]].map(([k,v])=>`<div style="font-size:10px; color:var(--text-muted); margin-top:4px;">${k}</div><div class="hash">${v}</div>`).join('')+`<div style="font-size:10px; color:var(--text-muted); margin-top:6px;">Structure</div><div class="hash">${st.parts.slice(0,24).join(' · ')}${st.parts.length>24?' …':''}</div><div style="font-size:10px; color:var(--text-muted); margin-top:6px;">EXIF</div><div class="hash">${ek.length?ek.map(k=>k+': '+st.exif[k]).join('<br>'):'none found'}</div>`;
+ $('#rt').textContent=`LIGHTBENCH IMAGE EXAMINATION REPORT\nDate: ${new Date().toISOString().slice(0,10)}\nFile: ${name} (${st.kind}, ${S.ow}x${S.oh}, ${u8.length} bytes)\nSHA-256: ${hs.sha256}\nSHA-1: ${hs.sha1}\nMD5: ${hs.md5}\n\nAssessment: ${vd} (indicator score ${sc}/100)\n\nChecks:\n${C.map(([n,ok])=>(ok?'[pass] ':'[flag] ')+n).join('\n')}\n\nFindings:\n${F.map(f=>'- ['+f.sev+'] '+f.t+': '+f.x).join('\n')||'- none'}\n\nNote: scores are heuristic indicators, not proof of authenticity or forgery.`}
+async function load(f){const u8=new Uint8Array(await f.arrayBuffer()),bm=await createImageBitmap(f),s=Math.min(1,900/bm.width);S.ow=bm.width;S.oh=bm.height;S.w=Math.round(bm.width*s);S.h=Math.round(bm.height*s);cvO.width=cvP.width=S.w;cvO.height=cvP.height=S.h;xO.drawImage(bm,0,0,S.w,S.h);S.src=xO.getImageData(0,0,S.w,S.h);$('#hint').textContent='Analysing image structure...';await analyze(u8,f.name||'image');setMode(S.mode);clip()}
+$('#fi').onchange=e=>e.target.files[0]&&load(e.target.files[0]);
+const mk=(w,h,f)=>{const c=document.createElement('canvas');c.width=w;c.height=h;f(c.getContext('2d'),w,h);return c},bl=(c,t,q)=>new Promise(r=>c.toBlob(r,t,q)),
+nz=(x,a,r)=>{const i=x.getImageData(...r),d=i.data;for(let k=0;k<d.length;k+=4){const n=(Math.random()-.5)*a;d[k]+=n;d[k+1]+=n;d[k+2]+=n}x.putImageData(i,r[0],r[1])};
+const PRE={async splice(){const c=mk(640,420,(x,w,h)=>{x.fillStyle='#fbfaf5';x.fillRect(0,0,w,h);x.fillStyle='#222';x.font='bold 26px serif';x.fillText('PAYMENT AUTHORISATION',50,60);x.font='18px serif';['Payee: Northwind Traders','Account: 4082-9912-7491','Reference: INV-20417','Status: VERIFIED'].forEach((t,i)=>x.fillText(t,50,120+i*40));x.fillText('Amount:',50,310);x.font='bold 28px serif';x.fillText('$ 950.00',160,312);nz(x,10,[0,0,w,h])});
+ const im=await createImageBitmap(await bl(c,'image/jpeg',.8)),c2=mk(640,420,x=>x.drawImage(im,0,0)),x=c2.getContext('2d');x.fillStyle='#fbfaf5';x.fillRect(150,280,200,48);x.fillStyle='#222';x.font='bold 28px serif';x.fillText('$ 950,000.00',160,312);nz(x,70,[150,280,200,48]);return new File([await bl(c2,'image/jpeg',.92)],'invoice_edited.jpg')},
+async stego(){const c=mk(640,420,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#7fb2e5');g.addColorStop(.6,'#d9e6c8');g.addColorStop(1,'#4d7a3a');x.fillStyle=g;x.fillRect(0,0,w,h);x.fillStyle='#3b5f2e';x.beginPath();x.moveTo(0,330);x.quadraticCurveTo(200,200,420,320);x.lineTo(640,300);x.lineTo(640,420);x.lineTo(0,420);x.fill();nz(x,14,[0,0,w,h])}),x=c.getContext('2d'),t=mk(640,420,(y)=>{y.fillStyle='#000';y.font='bold 34px sans-serif';y.fillText('CONFIDENTIAL',160,200);y.font='22px sans-serif';y.fillText('Meet at 18.5204 N, 73.8567 E',130,250)}).getContext('2d').getImageData(0,0,640,420).data,i=x.getImageData(0,0,640,420),d=i.data;
+ for(let k=0;k<d.length;k+=4){if(t[k+3]>128)d[k]|=1}x.putImageData(i,0,0);return new File([await bl(c,'image/png')],'landscape_hidden.png')},
+async clean(){const c=mk(640,420,(x,w,h)=>{const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,'#e9c46a');g.addColorStop(1,'#264653');x.fillStyle=g;x.fillRect(0,0,w,h);x.fillStyle='#e76f51';x.beginPath();x.arc(420,180,90,0,7);x.fill();nz(x,16,[0,0,w,h])});return new File([await bl(c,'image/jpeg',.9)],'plain_photo.jpg')}};
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=async()=>load(await PRE[b.dataset.p]()));
+$('#cp1').onclick=async()=>{try{await navigator.clipboard.writeText($('#rt').textContent);$('#cp1').textContent='Copied!'}catch(e){$('#cp1').textContent='Copy blocked'}setTimeout(()=>$('#cp1').textContent='Copy Report',1800)};
+$('#pr').onclick=()=>window.print();
+setMode('ela');
+</script>
+</body>
+</html>
